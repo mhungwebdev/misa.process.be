@@ -1,0 +1,17 @@
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\obj\Debug\net6.0\MISA.PROCESS.BLL.csproj.AssemblyReference.cache
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\obj\Debug\net6.0\MISA.PROCESS.BLL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\obj\Debug\net6.0\MISA.PROCESS.BLL.AssemblyInfoInputs.cache
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\obj\Debug\net6.0\MISA.PROCESS.BLL.AssemblyInfo.cs
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\obj\Debug\net6.0\MISA.PROCESS.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\bin\Debug\net6.0\MISA.PROCESS.BLL.deps.json
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\bin\Debug\net6.0\MISA.PROCESS.BLL.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\bin\Debug\net6.0\MISA.PROCESS.BLL.pdb
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\bin\Debug\net6.0\MISA.PROCESS.COMMON.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\bin\Debug\net6.0\MISA.PROCESS.DAL.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\bin\Debug\net6.0\MISA.PROCESS.COMMON.pdb
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\bin\Debug\net6.0\MISA.PROCESS.DAL.pdb
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\obj\Debug\net6.0\MISA.PROCESS.BLL.csproj.CopyComplete
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\obj\Debug\net6.0\MISA.PROCESS.BLL.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\obj\Debug\net6.0\refint\MISA.PROCESS.BLL.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\obj\Debug\net6.0\MISA.PROCESS.BLL.pdb
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.BLL\obj\Debug\net6.0\ref\MISA.PROCESS.BLL.dll

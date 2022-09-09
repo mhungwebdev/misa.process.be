@@ -1,0 +1,15 @@
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\obj\Debug\net6.0\MISA.PROCESS.DAL.csproj.AssemblyReference.cache
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\obj\Debug\net6.0\MISA.PROCESS.DAL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\obj\Debug\net6.0\MISA.PROCESS.DAL.AssemblyInfoInputs.cache
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\obj\Debug\net6.0\MISA.PROCESS.DAL.AssemblyInfo.cs
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\obj\Debug\net6.0\MISA.PROCESS.DAL.csproj.CoreCompileInputs.cache
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\bin\Debug\net6.0\MISA.PROCESS.DAL.deps.json
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\bin\Debug\net6.0\MISA.PROCESS.DAL.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\bin\Debug\net6.0\MISA.PROCESS.DAL.pdb
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\bin\Debug\net6.0\MISA.PROCESS.COMMON.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\bin\Debug\net6.0\MISA.PROCESS.COMMON.pdb
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\obj\Debug\net6.0\MISA.PROCESS.DAL.csproj.CopyComplete
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\obj\Debug\net6.0\MISA.PROCESS.DAL.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\obj\Debug\net6.0\refint\MISA.PROCESS.DAL.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\obj\Debug\net6.0\MISA.PROCESS.DAL.pdb
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.INFRASTRUCTURE\obj\Debug\net6.0\ref\MISA.PROCESS.DAL.dll

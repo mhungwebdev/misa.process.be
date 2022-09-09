@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MISA.PROCESS.CORE\MISA.PROCESS.COMMON.csproj" />
+    <ProjectReference Include="..\MISA.PROCESS.INFRASTRUCTURE\MISA.PROCESS.DAL.csproj" />
+  </ItemGroup>
+
+</Project>

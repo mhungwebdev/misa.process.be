@@ -1,0 +1,14 @@
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\bin\Debug\net6.0\MISA.PROCESS.COMMON.deps.json
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\bin\Debug\net6.0\MISA.PROCESS.COMMON.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\bin\Debug\net6.0\MISA.PROCESS.COMMON.pdb
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\MISA.PROCESS.COMMON.csproj.AssemblyReference.cache
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\MISA.PROCESS.COMMON.Resources.Resources.resources
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\MISA.PROCESS.COMMON.csproj.GenerateResource.cache
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\MISA.PROCESS.COMMON.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\MISA.PROCESS.COMMON.AssemblyInfoInputs.cache
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\MISA.PROCESS.COMMON.AssemblyInfo.cs
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\MISA.PROCESS.COMMON.csproj.CoreCompileInputs.cache
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\MISA.PROCESS.COMMON.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\refint\MISA.PROCESS.COMMON.dll
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\MISA.PROCESS.COMMON.pdb
+C:\Users\Admin\OneDrive\Documents\MISA_Web06_GD2_LeManhHung\MISA.PROCESS\MISA.PROCESS.CORE\obj\Debug\net6.0\ref\MISA.PROCESS.COMMON.dll
