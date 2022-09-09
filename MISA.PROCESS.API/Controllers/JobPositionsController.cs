@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MISA.PROCESS.BLL.Interfaces.InterfaceService;
+using MISA.PROCESS.BLL.Interfaces;
 using MISA.PROCESS.COMMON.Entities;
-using MISA.PROCESS.DAL.Interfaces.InterfaceRepository;
+using MISA.PROCESS.DAL.Interfaces;
 
 namespace MISA.PROCESS.API.Controllers
 {

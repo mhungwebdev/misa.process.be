@@ -14,13 +14,21 @@ namespace MISA.PROCESS.COMMON.Entities
         /// </summary>
         [PrimaryKey("User_Role")]
         [Length(36)]
-        public Guid UserID { get; set; }
+        [FieldInsert]
+        public Guid? UserID { get; set; }
 
         /// <summary>
         /// Khóa chính
         /// </summary>
         [PrimaryKey("User_Role")]
         [Length(36)]
-        public Guid RoleID { get; set; }
+        [FieldInsert]
+        public Guid? RoleID { get; set; }
+
+        public UserRole(Guid? userID, Guid? roleID)
+        {
+            UserID = userID;
+            RoleID = roleID;
+        }
     }
 }

@@ -1,7 +1,7 @@
 using MISA.core.Exceptions;
-using MISA.PROCESS.BLL.Interfaces.InterfaceService;
+using MISA.PROCESS.BLL.Interfaces;
 using MISA.PROCESS.BLL.Services;
-using MISA.PROCESS.DAL.Interfaces.InterfaceRepository;
+using MISA.PROCESS.DAL.Interfaces;
 using MISA.PROCESS.DAL.Repository;
 
 var builder = WebApplication.CreateBuilder(args);

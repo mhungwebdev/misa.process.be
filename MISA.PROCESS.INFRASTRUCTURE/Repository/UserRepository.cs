@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using MISA.PROCESS.COMMON.Entities;
 using MISA.PROCESS.COMMON.Enum;
 using MISA.PROCESS.COMMON.MISAAttributes;
-using MISA.PROCESS.DAL.Interfaces.InterfaceRepository;
+using MISA.PROCESS.DAL.Interfaces;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -144,114 +144,54 @@ namespace MISA.PROCESS.DAL.Repository
             using(var transaction = sqlConnection.BeginTransaction())
             {
                 DynamicParameters parameters = new DynamicParameters();
-                string sqlInsertMultiUser, sqlInsertMultiUserRole;
-                HandleBuildCommandInsertMultiUser(users, parameters, out sqlInsertMultiUser, out sqlInsertMultiUserRole);
+                var userRoles = HandleUserRoleInsert(users);
+                var sqlInsertMultiUserRole = BuildSqlInsertMulti<UserRole>(userRoles, parameters);
+                var sqlInsertMultiUser = BuildSqlInsertMulti(users,parameters);
 
-                parameters.Add("@Now", DateTime.Now);
-                sqlInsertMultiUser = sqlInsertMultiUser[..^1];
-                var userInseted = sqlConnection.Execute(sqlInsertMultiUser, transaction: transaction, param: parameters);
-                sqlInsertMultiUserRole = sqlInsertMultiUserRole[..^1];
-                sqlConnection.Execute(sqlInsertMultiUserRole, transaction: transaction, param: parameters);
+                var userInserted = sqlConnection.Execute(sqlInsertMultiUser, param: parameters, transaction: transaction);
+                var userRoleInserted = sqlConnection.Execute(sqlInsertMultiUserRole, param: parameters, transaction: transaction);
 
-                if (userInseted != users.Count)
+                if (userInserted != users.Count || userRoleInserted != userRoles.Count)
                     transaction.Rollback();
+                else
+                    transaction.Commit();
 
-                transaction.Commit();
-
-                sqlConnection.Dispose();
-                sqlConnection.Close();
-
-                return userInseted;
+                CloseDB();
+                return userInserted;
             }
         }
         #endregion
 
-        #region Build Command Insert Multi User
+        #region HandleUserRoleInsert
         /// <summary>
-        /// Build câu lệnh thêm mới user và userrole
-        /// Author : mhungwebdev(3/9/2022)
+        /// Build list user role và xử lý RoleNames cho user
+        /// Author : mhungwebdev (9/9/2022)
         /// </summary>
-        /// <param name="users">list user insert</param>
-        /// <param name="parameters">param</param>
-        /// <param name="sqlInsertMultiUser">câu sql insert nhiều user</param>
-        /// <param name="sqlInsertMultiUserRole">câu sql insert nhiều user role</param>
-        private static void HandleBuildCommandInsertMultiUser(List<User> users, DynamicParameters parameters, out string sqlInsertMultiUser, out string sqlInsertMultiUserRole)
+        /// <param name="users">list user insert hàng loạt</param>
+        /// <returns>list user role</returns>
+        List<UserRole> HandleUserRoleInsert(List<User> users)
         {
-            sqlInsertMultiUser = $"INSERT INTO USER" +
-                                $"(UserID, " +
-                                $"EmployeeCode, " +
-                                $"FullName, " +
-                                $"DepartmentID, " +
-                                $"JobPositionID, " +
-                                $"Email, " +
-                                $"ActiveStatus, " +
-                                $"AvatarColor, " +
-                                $"RoleNames, " +
-                                $"CreatedBy, " +
-                                $"CreatedDate, " +
-                                $"ModifiedBy, " +
-                                $"ModifiedDate) VALUES ";
-            sqlInsertMultiUserRole = $"INSERT INTO User_Role " +
-                                         $"(UserID," +
-                                         $"RoleID," +
-                                         $"CreatedBy," +
-                                         $"CreatedDate," +
-                                         $"ModifiedBy," +
-                                         $"ModifiedDate) " +
-                                         $"VALUES ";
-            int userIndex = 0;
-            int roleIndex = 0;
-            foreach (User user in users)
+            List<UserRole> userRoles = new List<UserRole>();
+
+            foreach(User user in users)
             {
+                int userRoleIndex = 0;
                 string roleNames = string.Empty;
-                sqlInsertMultiUser += $"(@UserID{userIndex}," +
-                    $"@EmployeeCode{userIndex}," +
-                    $"@FullName{userIndex}," +
-                    $"@DepartmentID{userIndex}," +
-                    $"@JobPositionID{userIndex}," +
-                    $"@Email{userIndex}," +
-                    $"@ActiveStatus{userIndex}," +
-                    $"@AvatarColor{userIndex}," +
-                    $"@RoleNames{userIndex}," +
-                    $"'mhungwebdev'," +
-                    $"@Now," +
-                    $"'mhungwebdev'," +
-                    $"@Now),";
-
-                int count = 0;
-                foreach (RoleUpdate roleUpdate in user.Roles)
+                foreach(RoleUpdate role in user.Roles)
                 {
-                    sqlInsertMultiUserRole += $"(@UserUserID{roleIndex}," +
-                        $"@RoleRoleID{roleIndex}," +
-                        $"'mhungwebdev'," +
-                        $"@Now," +
-                        $"'mhungwebdev'," +
-                        $"@Now),";
+                    userRoles.Add(new UserRole(user.UserID, role.RoleID));
 
-                    parameters.Add($"@UserUserID{roleIndex}", user.UserID);
-                    parameters.Add($"@RoleRoleID{roleIndex}", roleUpdate.RoleID);
-
-                    if (count == 0)
-                        roleNames += $"{roleUpdate.RoleName}";
+                    if (userRoleIndex == 0)
+                        roleNames += $"{role.RoleName}";
                     else
-                        roleNames += $"; {roleUpdate.RoleName}";
+                        roleNames += $"; {role.RoleName}";
 
-                    roleIndex++;
-                    count++;
+                    userRoleIndex++;
                 }
-
-                parameters.Add($"@UserID{userIndex}", user.UserID);
-                parameters.Add($"@EmployeeCode{userIndex}", user.EmployeeCode);
-                parameters.Add($"@FullName{userIndex}", user.FullName);
-                parameters.Add($"@DepartmentID{userIndex}", user.DepartmentID);
-                parameters.Add($"@JobPositionID{userIndex}", user.JobPositionID);
-                parameters.Add($"@Email{userIndex}", user.Email);
-                parameters.Add($"@ActiveStatus{userIndex}", user.ActiveStatus);
-                parameters.Add($"@AvatarColor{userIndex}", user.AvatarColor);
-                parameters.Add($"@RoleNames{userIndex}", roleNames);
-
-                userIndex++;
+                user.RoleNames = roleNames;
             }
+
+            return userRoles;
         }
         #endregion
 

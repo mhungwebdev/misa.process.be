@@ -1,10 +1,10 @@
 ﻿using MISA.core.Exceptions;
-using MISA.PROCESS.BLL.Interfaces.InterfaceService;
+using MISA.PROCESS.BLL.Interfaces;
 using MISA.PROCESS.COMMON.Entities;
 using MISA.PROCESS.COMMON.Enum;
 using MISA.PROCESS.COMMON.MISAAttributes;
 using MISA.PROCESS.COMMON.Resources;
-using MISA.PROCESS.DAL.Interfaces.InterfaceRepository;
+using MISA.PROCESS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -209,6 +209,7 @@ namespace MISA.PROCESS.BLL.Services
         }
         #endregion
 
+        #region ValidateListRecord
         /// <summary>
         /// Validate một list record
         /// Author : mhungwebdev (9/9/2022)
@@ -238,19 +239,28 @@ namespace MISA.PROCESS.BLL.Services
 
             return listError;
         }
+        #endregion
 
-        
+        #region InsertMulti
+        /// <summary>
+        /// Thêm mới hàng loạt
+        /// Author : mhungwebdev (9/9/2022)
+        /// </summary>
+        /// <param name="entities">list record thêm mới</param>
+        /// <returns>số bản ghi thêm mới thành công</returns>
         public virtual int InsertMulti(List<MISAEntity> entities)
         {
             List<Object> listError = ValidateListRecord(entities);
             if (listError.Count() > 0)
                 HandleThrowError(InteractiveMode.Multi, listError);
-            
+
             var res = _baseRepository.InsertMulti(entities);
 
             return res;
         }
+        #endregion
 
+        #region HandleThrowError
         /// <summary>
         /// Xử lý trả về lỗi
         /// Author : mhungwebdev (9/9/2022)
@@ -259,19 +269,26 @@ namespace MISA.PROCESS.BLL.Services
         /// <param name="errors">list error</param>
         /// <param name="error">đối tượng error</param>
         /// <exception cref="MISAException">Thông báo lỗi về Client</exception>
-        public virtual void HandleThrowError(InteractiveMode interactiveMode, List<Object> errors = null,Dictionary<string,string> error = null)
+        public virtual void HandleThrowError(InteractiveMode interactiveMode, List<Object> errors = null, Dictionary<string, string> error = null)
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
             result.Add("devMsg", "");
             result.Add("userMsg", Resources.InputInValid);
+            switch (interactiveMode)
+            {
+                case InteractiveMode.Multi:
+                    result.Add("errors", errors);
+                    break;
+                case InteractiveMode.Single:
+                    result.Add("errors", error);
+                    break;
+                default:
+                    break;
 
-            if(interactiveMode == InteractiveMode.Multi)
-                result.Add("errors", errors);
-
-            if (interactiveMode != InteractiveMode.Single)
-                result.Add("errors", error);
+            }
 
             throw new MISAException(result);
         }
+        #endregion
     }
 }

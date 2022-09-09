@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using MISA.PROCESS.COMMON.Entities;
 using MISA.PROCESS.COMMON.MISAAttributes;
-using MISA.PROCESS.DAL.Interfaces.InterfaceRepository;
+using MISA.PROCESS.DAL.Interfaces;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -25,6 +25,12 @@ namespace MISA.PROCESS.DAL.Repository
             connectString = configuration.GetConnectionString("MISA_PROCESS_LOCALHOST");
         }
         #endregion
+
+        protected void CloseDB()
+        {
+            sqlConnection.Dispose();
+            sqlConnection.Close();
+        }
 
         #region Check unique
         /// <summary>
@@ -145,8 +151,7 @@ namespace MISA.PROCESS.DAL.Repository
                 var res = sqlConnection.Execute(store, param: entity, transaction: transaction, commandType: CommandType.StoredProcedure);
 
                 transaction.Commit();
-                sqlConnection.Dispose();
-                sqlConnection.Close();
+                CloseDB();
 
                 return res;
             }
@@ -173,10 +178,10 @@ namespace MISA.PROCESS.DAL.Repository
 
                 if (res < entities.Count)
                     transaction.Rollback();
+                else
+                    transaction.Commit();
 
-                transaction.Commit();
-                sqlConnection.Dispose();
-                sqlConnection.Close();
+                CloseDB();
 
                 return res;
             }
@@ -191,14 +196,14 @@ namespace MISA.PROCESS.DAL.Repository
         /// <param name="entities">List record thêm mới hàng loạt</param>
         /// <param name="parameters">param của câu lệnh</param>
         /// <returns>Câu lệnh thêm mới hàng loạt</returns>
-        protected string BuildSqlInsertMulti(List<MISAEntity> entities, DynamicParameters parameters)
+        protected string BuildSqlInsertMulti<MISAEntity>(List<MISAEntity>? entities, DynamicParameters parameters)
         {
             var propPK = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PrimaryKey))).FirstOrDefault();
             var tableName = (propPK.GetCustomAttributes(typeof(PrimaryKey), true).FirstOrDefault() as PrimaryKey).TableName;
             var propInserts = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(FieldInsert)));
 
             string sqlInsertMulti = BuildFieldInsert(tableName, propInserts);
-            sqlInsertMulti = BuildValueInsertMulti(entities, parameters, propInserts, sqlInsertMulti);
+            sqlInsertMulti = BuildValueInsertMulti(entities, parameters, propInserts, sqlInsertMulti,tableName);
 
             return sqlInsertMulti;
         }
@@ -214,7 +219,7 @@ namespace MISA.PROCESS.DAL.Repository
         /// <param name="propInserts">các property insert</param>
         /// <param name="sqlInsertMulti">Câu lệnh sql có các field và từ khóa values sẵn</param>
         /// <returns>Câu lệnh thêm mới hàng loạt hoàn chỉnh</returns>
-        private static string BuildValueInsertMulti(List<MISAEntity> entities, DynamicParameters parameters, IEnumerable<System.Reflection.PropertyInfo> propInserts, string sqlInsertMulti)
+        private static string BuildValueInsertMulti<MISAEntity>(List<MISAEntity> entities, DynamicParameters parameters, IEnumerable<System.Reflection.PropertyInfo> propInserts, string sqlInsertMulti,string tableName)
         {
             int recordIndex = 0;
             foreach (MISAEntity entity in entities)
@@ -228,8 +233,8 @@ namespace MISA.PROCESS.DAL.Repository
                     if (fieldName.Equals("CreatedDate") || fieldName.Equals("ModifiedDate"))
                         value = DateTime.Now;
 
-                    valueRecord += $"@{fieldName}{recordIndex},";
-                    parameters.Add($"@{fieldName}{recordIndex}", value);
+                    valueRecord += $"@{tableName}{fieldName}{recordIndex},";
+                    parameters.Add($"@{tableName}{fieldName}{recordIndex}", value);
                 }
                 recordIndex++;
                 valueRecord = valueRecord[..^1] + "),";

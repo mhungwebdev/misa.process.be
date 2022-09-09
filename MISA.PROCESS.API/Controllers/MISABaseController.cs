@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MISA.PROCESS.BLL.Interfaces.InterfaceService;
-using MISA.PROCESS.DAL.Interfaces.InterfaceRepository;
+using MISA.PROCESS.BLL.Interfaces;
+using MISA.PROCESS.DAL.Interfaces;
 
 namespace MISA.PROCESS.API.Controllers
 {
@@ -83,6 +83,7 @@ namespace MISA.PROCESS.API.Controllers
         }
         #endregion
 
+        #region InsertMulti
         [HttpPost("InsertMulti")]
         public IActionResult InsertMulti(List<MISAEntity> entities)
         {
@@ -90,6 +91,7 @@ namespace MISA.PROCESS.API.Controllers
 
             return StatusCode(201, res);
         }
+        #endregion
 
         #region Update
         /// <summary>

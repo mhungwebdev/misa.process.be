@@ -1,6 +1,6 @@
-﻿using MISA.PROCESS.BLL.Interfaces.InterfaceService;
+﻿using MISA.PROCESS.BLL.Interfaces;
 using MISA.PROCESS.COMMON.Entities;
-using MISA.PROCESS.DAL.Interfaces.InterfaceRepository;
+using MISA.PROCESS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

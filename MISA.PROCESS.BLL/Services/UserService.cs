@@ -1,9 +1,9 @@
 ﻿using MISA.core.Exceptions;
-using MISA.PROCESS.BLL.Interfaces.InterfaceService;
+using MISA.PROCESS.BLL.Interfaces;
 using MISA.PROCESS.COMMON.Entities;
 using MISA.PROCESS.COMMON.Enum;
 using MISA.PROCESS.COMMON.Resources;
-using MISA.PROCESS.DAL.Interfaces.InterfaceRepository;
+using MISA.PROCESS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MISA.PROCESS.DAL.Interfaces.InterfaceRepository
+namespace MISA.PROCESS.DAL.Interfaces
 {
     public interface IBaseRepository<MISAEntity>
     {
@@ -57,6 +57,12 @@ namespace MISA.PROCESS.DAL.Interfaces.InterfaceRepository
         /// <returns>true nếu trùng và false với trường hợp ngược lại</returns>
         bool CheckUnique(object value, string fieldName, Guid? id);
 
+        /// <summary>
+        /// Thêm mới hàng loạt
+        /// Author : mhungwebdev (9/9/2022)
+        /// </summary>
+        /// <param name="entities">list record thêm mới</param>
+        /// <returns>số bản ghi thêm thành công</returns>
         int InsertMulti(List<MISAEntity> entities);
     }
 }

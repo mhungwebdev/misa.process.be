@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MISA.PROCESS.DAL.Interfaces.InterfaceRepository
+namespace MISA.PROCESS.DAL.Interfaces
 {
     public interface IUserRepository : IBaseRepository<User>
     {
@@ -26,14 +26,6 @@ namespace MISA.PROCESS.DAL.Interfaces.InterfaceRepository
         /// </summary>
         /// <returns>Mã nhân viên mới</returns>
         string GenerateNewEmployeeCode();
-
-        /// <summary>
-        /// Thêm mới hàng loạt
-        /// Author : mhungwebdev (30/8/2022)
-        /// </summary>
-        /// <param name="users">List user thêm mới</param>
-        /// <returns>Số bản ghi thêm mới thành công</returns>
-        int InsertMulti(List<User> users);
 
         /// <summary>
         /// Update role cho user
