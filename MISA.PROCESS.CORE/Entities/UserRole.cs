@@ -15,7 +15,7 @@ namespace MISA.PROCESS.COMMON.Entities
         [PrimaryKey("User_Role")]
         [Length(36)]
         [FieldInsert]
-        public Guid? UserID { get; set; }
+        public Guid? RoleID { get; set; }
 
         /// <summary>
         /// Khóa chính
@@ -23,7 +23,7 @@ namespace MISA.PROCESS.COMMON.Entities
         [PrimaryKey("User_Role")]
         [Length(36)]
         [FieldInsert]
-        public Guid? RoleID { get; set; }
+        public Guid? UserID { get; set; }
 
         public UserRole(Guid? userID, Guid? roleID)
         {

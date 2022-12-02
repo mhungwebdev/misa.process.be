@@ -1,4 +1,4 @@
-using MISA.core.Exceptions;
+using MISA.PROCESS.COMMON.Exceptions;
 using MISA.PROCESS.BLL.Interfaces;
 using MISA.PROCESS.BLL.Services;
 using MISA.PROCESS.DAL.Interfaces;
@@ -27,6 +27,7 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IJobPositionRepository, JobPositionRepository>();
 builder.Services.AddScoped<IJobPositionService, JobPositionService>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddCors();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {

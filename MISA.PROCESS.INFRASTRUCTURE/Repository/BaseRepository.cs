@@ -26,10 +26,33 @@ namespace MISA.PROCESS.DAL.Repository
         }
         #endregion
 
+        #region CloseDB
+        /// <summary>
+        /// Đóng kêt nối DB
+        /// </summary>
         protected void CloseDB()
         {
             sqlConnection.Dispose();
             sqlConnection.Close();
+        }
+        #endregion
+
+        #region OpenDB
+        /// <summary>
+        /// Mở kết nối DB
+        /// </summary>
+        protected void OpenDB()
+        {
+            sqlConnection = new MySqlConnection(connectString);
+            sqlConnection.Open();
+        }
+        #endregion
+
+        public IDbConnection GetConnection()
+        {
+            sqlConnection = new MySqlConnection(connectString);
+
+            return sqlConnection;
         }
 
         #region Check unique
@@ -41,7 +64,7 @@ namespace MISA.PROCESS.DAL.Repository
         /// <param name="fieldName">Tên field muốn check</param>
         /// <param name="id">id của đối tượng muốn check</param>
         /// <returns>true nếu trùng và false với trường hợp ngược lại</returns>
-        public bool CheckUnique(object value, string fieldName, Guid? id)
+        public bool CheckUnique(object value, string fieldName, Guid? id = null)
         {
             using (var sqlConnection = new MySqlConnection(connectString))
             {
@@ -100,7 +123,7 @@ namespace MISA.PROCESS.DAL.Repository
             using (sqlConnection = new MySqlConnection(connectString))
             {
                 var tableName = typeof(MISAEntity).Name;
-                var store = $"Proc_GetAll{tableName}";
+                var store = $"Proc_{tableName}_GetAll";
 
                 var res = sqlConnection.Query<MISAEntity>(store, commandType: CommandType.StoredProcedure);
 
@@ -121,7 +144,7 @@ namespace MISA.PROCESS.DAL.Repository
             using (sqlConnection = new MySqlConnection(connectString))
             {
                 var tableName = typeof(MISAEntity).Name;
-                var store = $"Proc_Get{tableName}ById";
+                var store = $"Proc_{tableName}_GetById";
                 DynamicParameters parameters = new DynamicParameters();
 
                 parameters.Add("Id", id.ToString());
@@ -141,12 +164,11 @@ namespace MISA.PROCESS.DAL.Repository
         /// <returns>1 nếu thành công</returns>
         public virtual int Insert(MISAEntity entity)
         {
-            sqlConnection = new MySqlConnection(connectString);
-            sqlConnection.Open();
+            OpenDB();
             using (var transaction = sqlConnection.BeginTransaction())
             {
                 var tableName = typeof(MISAEntity).Name;
-                var store = $"Proc_Insert{tableName}";
+                var store = $"Proc_{tableName}_Insert";
 
                 var res = sqlConnection.Execute(store, param: entity, transaction: transaction, commandType: CommandType.StoredProcedure);
 
@@ -165,26 +187,14 @@ namespace MISA.PROCESS.DAL.Repository
         /// </summary>
         /// <param name="entities">list record thêm mới</param>
         /// <returns>Số bản ghi thêm mới thành công</returns>
-        public virtual int InsertMulti(List<MISAEntity> entities)
+        public virtual int InsertMulti<MISAEntity>(List<MISAEntity> entities, IDbTransaction transaction)
         {
-            var sqlConnection = new MySqlConnection(connectString);
-            sqlConnection.Open();
-            using(var transaction = sqlConnection.BeginTransaction())
-            {
-                DynamicParameters parameters = new DynamicParameters();
-                var sqlInsertMulti = BuildSqlInsertMulti(entities,parameters);
+            DynamicParameters parameters = new DynamicParameters();
+            var sqlInsertMulti = BuildSqlInsertMulti<MISAEntity>(entities, parameters);
 
-                var res = sqlConnection.Execute(sqlInsertMulti,param:parameters,transaction: transaction);
+            var res = sqlConnection.Execute(sqlInsertMulti, param: parameters, transaction: transaction);
 
-                if (res < entities.Count)
-                    transaction.Rollback();
-                else
-                    transaction.Commit();
-
-                CloseDB();
-
-                return res;
-            }
+            return res;
         }
         #endregion
 
@@ -196,14 +206,14 @@ namespace MISA.PROCESS.DAL.Repository
         /// <param name="entities">List record thêm mới hàng loạt</param>
         /// <param name="parameters">param của câu lệnh</param>
         /// <returns>Câu lệnh thêm mới hàng loạt</returns>
-        protected string BuildSqlInsertMulti<MISAEntity>(List<MISAEntity>? entities, DynamicParameters parameters)
+        public string BuildSqlInsertMulti<MISAEntity>(List<MISAEntity>? entities, DynamicParameters parameters)
         {
             var propPK = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PrimaryKey))).FirstOrDefault();
             var tableName = (propPK.GetCustomAttributes(typeof(PrimaryKey), true).FirstOrDefault() as PrimaryKey).TableName;
             var propInserts = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(FieldInsert)));
 
             string sqlInsertMulti = BuildFieldInsert(tableName, propInserts);
-            sqlInsertMulti = BuildValueInsertMulti(entities, parameters, propInserts, sqlInsertMulti,tableName);
+            sqlInsertMulti = BuildValueInsertMulti(entities, parameters, propInserts, sqlInsertMulti, tableName);
 
             return sqlInsertMulti;
         }
@@ -219,7 +229,7 @@ namespace MISA.PROCESS.DAL.Repository
         /// <param name="propInserts">các property insert</param>
         /// <param name="sqlInsertMulti">Câu lệnh sql có các field và từ khóa values sẵn</param>
         /// <returns>Câu lệnh thêm mới hàng loạt hoàn chỉnh</returns>
-        private static string BuildValueInsertMulti<MISAEntity>(List<MISAEntity> entities, DynamicParameters parameters, IEnumerable<System.Reflection.PropertyInfo> propInserts, string sqlInsertMulti,string tableName)
+        private static string BuildValueInsertMulti<MISAEntity>(List<MISAEntity> entities, DynamicParameters parameters, IEnumerable<System.Reflection.PropertyInfo> propInserts, string sqlInsertMulti, string tableName)
         {
             int recordIndex = 0;
             foreach (MISAEntity entity in entities)
@@ -277,6 +287,56 @@ namespace MISA.PROCESS.DAL.Repository
         public int Update(MISAEntity entity, Guid id)
         {
             return 1;
+        }
+        #endregion
+
+        #region DeleteMulti
+        /// <summary>
+        /// Xóa hàng loạt
+        /// Author : mhungwebdev (10/9/2022)
+        /// </summary>
+        /// <param name="ids">list id bản ghi muốn xóa</param>
+        /// <returns>số bản ghi xóa thành công</returns>
+        public int DeleteMulti<MISAEntity>(List<Guid> ids, IDbTransaction transaction, string? subPKName = null, Guid? subID = null)
+        {
+
+            DynamicParameters parameters = new DynamicParameters();
+            var sqlDeleteMulti = BuildCommandDeleteMulti<MISAEntity>(ids, parameters, subPKName, subID);
+
+            var res = sqlConnection.Execute(sqlDeleteMulti, parameters, transaction);
+
+            if (res != ids.Count)
+                transaction.Rollback();
+
+            return res;
+        }
+        #endregion
+
+        #region BuildCommandDeleteMulti
+        public string BuildCommandDeleteMulti<MISAEntity>(List<Guid> ids, DynamicParameters parameters, string? subPKName = null, Guid? subID = null)
+        {
+            var propPK = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PrimaryKey))).FirstOrDefault();
+            var PKName = propPK.Name;
+            var tableName = (propPK.GetCustomAttributes(typeof(PrimaryKey), true).FirstOrDefault() as PrimaryKey).TableName;
+
+            var sqlCommandDeleteMulti = $"Delete from {tableName} where {PKName} in (";
+
+            int index = 0;
+            foreach (Guid id in ids)
+            {
+                sqlCommandDeleteMulti += $"@{tableName}_{PKName}_{index},";
+                parameters.Add($"@{tableName}_{PKName}_{index}", id);
+                index++;
+            }
+            sqlCommandDeleteMulti = sqlCommandDeleteMulti[..^1] + ")";
+
+            if (subID != null && subPKName != null)
+            {
+                sqlCommandDeleteMulti += $" AND {subPKName} = @{subPKName}";
+                parameters.Add($"@{subPKName}", subID);
+            }
+
+            return sqlCommandDeleteMulti;
         }
         #endregion
     }

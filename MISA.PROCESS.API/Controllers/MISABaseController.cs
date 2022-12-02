@@ -84,6 +84,12 @@ namespace MISA.PROCESS.API.Controllers
         #endregion
 
         #region InsertMulti
+        /// <summary>
+        /// Thêm mới hàng loạt
+        /// Author : mhungwebdev (9/9/2022)
+        /// </summary>
+        /// <param name="entities">list record thêm mới</param>
+        /// <returns>Số bản ghi thêm mới thành công</returns>
         [HttpPost("InsertMulti")]
         public IActionResult InsertMulti(List<MISAEntity> entities)
         {
@@ -106,7 +112,7 @@ namespace MISA.PROCESS.API.Controllers
         {
             var res = _baseService.Update(entity, id);
 
-            return StatusCode(201, res);
+            return StatusCode(200, res);
         }
         #endregion
     }

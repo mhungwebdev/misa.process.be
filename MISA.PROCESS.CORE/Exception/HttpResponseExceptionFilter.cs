@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IActionFilter = Microsoft.AspNetCore.Mvc.Filters.IActionFilter;
 
-namespace MISA.core.Exceptions
+namespace MISA.PROCESS.COMMON.Exceptions
 {
     /// <summary>
     /// Tạo middleware exception
@@ -36,7 +36,7 @@ namespace MISA.core.Exceptions
                 {
                     var result = new
                     {
-                        userMsg = Resources.CodeError,
+                        userMsg = Resources.Resources.CodeError,
                         devMsg = context.Exception.Message,
                         errorMsg = "",
                     };

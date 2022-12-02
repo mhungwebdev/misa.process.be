@@ -1,11 +1,12 @@
-﻿using MISA.core.Exceptions;
-using MISA.PROCESS.BLL.Interfaces;
+﻿using MISA.PROCESS.BLL.Interfaces;
 using MISA.PROCESS.COMMON.Entities;
 using MISA.PROCESS.COMMON.Enum;
 using MISA.PROCESS.COMMON.Resources;
 using MISA.PROCESS.DAL.Interfaces;
+using MISA.PROCESS.DAL.Repository;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Resources;
 using System.Text;
@@ -33,12 +34,27 @@ namespace MISA.PROCESS.BLL.Services
         /// <returns>Số bản ghi sửa thành công</returns>
         public int UpdateRole(List<RoleUpdate> roles, Guid userID)
         {
-            List<RoleUpdate> listDelete, listInsert, listLastUpdate;
-            HandleListRoleUpdate(roles, out listDelete, out listInsert, out listLastUpdate);
+            List<Guid> listDelete;
+            List<UserRole> listInsert;
+            List<RoleUpdate> listLastUpdate;
+            HandleListRoleUpdate(roles, out listDelete, out listInsert, out listLastUpdate,userID);
 
-            var res = _userRepository.UpdateRole(listLastUpdate, listDelete, listInsert, userID);
+            connection = _userRepository.GetConnection();
+            connection.Open();
+            using (var transaction = connection.BeginTransaction())
+            {
+                var res = _userRepository.UpdateRole(listLastUpdate, listDelete, listInsert, userID,transaction);
 
-            return res;
+                if (res != 1)
+                    transaction.Rollback();
+                else
+                    transaction.Commit();
+;
+                connection.Dispose();
+                connection.Close();
+                return res;
+            }
+
         }
         #endregion
 
@@ -48,32 +64,38 @@ namespace MISA.PROCESS.BLL.Services
         /// Author : mhungwebdev (5/9/2022)
         /// </summary>
         /// <param name="roles">mảng role update</param>
-        /// <param name="listDelete">mảng role sẽ xóa</param>
-        /// <param name="listInsert">mảng role sẽ insert</param>
+        /// <param name="listDelete">mảng id user role sẽ xóa</param>
+        /// <param name="listInsert">mảng user role sẽ insert</param>
         /// <param name="listLastUpdate">mảng role cuối cùng của user</param>
-        private static void HandleListRoleUpdate(List<RoleUpdate> roles, out List<RoleUpdate> listDelete, out List<RoleUpdate> listInsert, out List<RoleUpdate> listLastUpdate)
+        /// <param name="userID">Id đối tượng muốn sửa role</param>
+        private static void HandleListRoleUpdate(List<RoleUpdate> roles, out List<Guid> listDelete, out List<UserRole> listInsert, out List<RoleUpdate> listLastUpdate,Guid userID)
         {
-            listDelete = new List<RoleUpdate>();
-            listInsert = new List<RoleUpdate>();
+            listDelete = new List<Guid>();
+            listInsert = new List<UserRole>();
             listLastUpdate = new List<RoleUpdate>();
             foreach (RoleUpdate roleUpdate in roles)
             {
-                if (roleUpdate.UpdateMode != UpdateRoleMode.Delete)
+                switch (roleUpdate.UpdateMode)
                 {
-                    listLastUpdate.Add(roleUpdate);
-                    if (roleUpdate.UpdateMode == UpdateRoleMode.Insert)
-                        listInsert.Add(roleUpdate);
-                }
-                else
-                {
-                    listDelete.Add(roleUpdate);
+                    case UpdateRoleMode.Delete:
+                        listDelete.Add(roleUpdate.RoleID);
+                        break;
+                    case UpdateRoleMode.Insert:
+                        listLastUpdate.Add(roleUpdate);
+                        listInsert.Add(new UserRole(userID, roleUpdate.RoleID));
+                        break;
+                    case UpdateRoleMode.NotDoEverything:
+                        listLastUpdate.Add(roleUpdate);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
         #endregion
 
         #region Validate Custom
-        public override Dictionary<string, string> ValidateCustom(User user, Guid? id)
+        public override Dictionary<string, string> ValidateCustom(User user, Guid? id = null)
         {
             Dictionary<string, string> errors = new Dictionary<string, string>();
             var employeeCodeEnd = user.EmployeeCode[user.EmployeeCode.Length - 1];
@@ -84,6 +106,19 @@ namespace MISA.PROCESS.BLL.Services
             }
 
             return errors;
+        }
+        #endregion
+
+        #region DoInsertMulti
+        /// <summary>
+        /// Thêm mới hàng loạt
+        /// Author : mhungwebdev (9/9/2022)
+        /// </summary>
+        /// <param name="users">list user thêm mới</param>
+        /// <returns>số bản ghi thêm mới thành công</returns>
+        public override int DoInsertMulti(List<User> users, IDbTransaction transaction)
+        {
+            return _userRepository.InsertMultiUserAndUserRole(users, transaction);
         }
         #endregion
     }

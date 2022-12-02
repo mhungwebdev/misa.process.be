@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,7 +56,7 @@ namespace MISA.PROCESS.DAL.Interfaces
         /// <param name="fieldName">Tên field muốn check</param>
         /// <param name="id">id của đối tượng muốn check</param>
         /// <returns>true nếu trùng và false với trường hợp ngược lại</returns>
-        bool CheckUnique(object value, string fieldName, Guid? id);
+        bool CheckUnique(object value, string fieldName, Guid? id = null);
 
         /// <summary>
         /// Thêm mới hàng loạt
@@ -63,6 +64,13 @@ namespace MISA.PROCESS.DAL.Interfaces
         /// </summary>
         /// <param name="entities">list record thêm mới</param>
         /// <returns>số bản ghi thêm thành công</returns>
-        int InsertMulti(List<MISAEntity> entities);
+        int InsertMulti<MISAEntity>(List<MISAEntity> entities, IDbTransaction transaction);
+
+        /// <summary>
+        /// Lấy connect tới db
+        /// Author : mhungwebdev (13/9/2022)
+        /// </summary>
+        /// <returns>Connection tới db</returns>
+        IDbConnection GetConnection();
     }
 }

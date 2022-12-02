@@ -17,7 +17,7 @@ namespace MISA.PROCESS.DAL.Repository
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
         #region Contructor
-        public UserRepository(IConfiguration configuration):base(configuration)
+        public UserRepository(IConfiguration configuration) : base(configuration)
         {
 
         }
@@ -39,19 +39,20 @@ namespace MISA.PROCESS.DAL.Repository
             {
                 DynamicParameters parameters = new DynamicParameters();
 
-                var store = $"Proc_FilterUser";
-                parameters.Add("Keyword",keyword);
-                parameters.Add("RoleID",roleID);
-                parameters.Add("LimitRecord",pageSize);
-                parameters.Add("Offset",pageSize*(pageNumber - 1));
-                parameters.Add("TotalRecord",direction:ParameterDirection.Output);
+                var store = $"Proc_User_Filter";
+                parameters.Add("Keyword", keyword);
+                parameters.Add("RoleID", roleID);
+                parameters.Add("LimitRecord", pageSize);
+                parameters.Add("Offset", pageSize * (pageNumber - 1));
+                parameters.Add("TotalRecord", direction: ParameterDirection.Output);
 
                 var data = sqlConnection.Query<User>(store, parameters, commandType: CommandType.StoredProcedure);
                 var totalRecord = parameters.Get<int>("TotalRecord");
 
-                var rowEnd = pageSize*pageNumber;
+                var rowEnd = pageSize * pageNumber;
 
-                if(pageSize*pageNumber > totalRecord) {
+                if (pageSize * pageNumber > totalRecord)
+                {
                     rowEnd = totalRecord;
                 }
 
@@ -79,25 +80,14 @@ namespace MISA.PROCESS.DAL.Repository
         {
             using (sqlConnection = new MySqlConnection(connectString))
             {
-                sqlConnection.Open();
-                string newEmployeeCode = String.Empty;
+                var sqlGetNewCode = "Proc_User_GetNewEmployeeCode";
+                DynamicParameters parameters = new DynamicParameters();
+                parameters.Add("NewEmployeeCode", direction: ParameterDirection.Output);
 
-                var sqlCommand = "Select EmployeeCode from User where EmployeeCode like '%NV-%' order by EmployeeCode desc limit 1 offset 0";
-                string employeeCodeBiggest = sqlConnection.QuerySingleOrDefault<string>(sqlCommand);
+                sqlConnection.Execute(sqlGetNewCode, parameters, commandType: CommandType.StoredProcedure);
+                var newEmployeeCode = parameters.Get<string>("NewEmployeeCode");
 
-                for (int i = employeeCodeBiggest.Length - 1; i > 0; i--)
-                {
-                    int n;
-                    bool isNumeric = int.TryParse(employeeCodeBiggest[i].ToString(), out n);
-                    if (isNumeric)
-                    {
-                        newEmployeeCode = employeeCodeBiggest[i].ToString() + newEmployeeCode;
-                    }
-                    else
-                        break;
-                }
-
-                return "NV-" + (int.Parse(newEmployeeCode) + 1);
+                return newEmployeeCode;
             }
         }
         #endregion
@@ -111,19 +101,16 @@ namespace MISA.PROCESS.DAL.Repository
         /// <returns></returns>
         public override User Get(Guid id)
         {
-            using(sqlConnection = new MySqlConnection(connectString))
+            using (sqlConnection = new MySqlConnection(connectString))
             {
-                var storeGetUser = "Proc_GetUserById";
-                var sqlCommandGetRoleIds = "Select * from Role Where RoleID in " +
-                    "(Select RoleID From User_Role Where UserID = @UserID)";
+                var storeGetUser = "Proc_User_GetById";
                 DynamicParameters parameters = new DynamicParameters();
                 parameters.Add("Id", id);
 
-                User user = sqlConnection.QuerySingleOrDefault<User>(storeGetUser,parameters, commandType:CommandType.StoredProcedure);
-                parameters.Add("@UserID",id);
-                var roles = sqlConnection.Query<RoleUpdate>(sqlCommandGetRoleIds,parameters).ToList();
+                var multiples = sqlConnection.QueryMultiple(storeGetUser, parameters, commandType: CommandType.StoredProcedure);
 
-                user.Roles = roles;
+                User user = multiples.Read<User>().First();
+                user.Roles = multiples.Read<RoleUpdate>().ToList();
 
                 return user;
             }
@@ -137,28 +124,17 @@ namespace MISA.PROCESS.DAL.Repository
         /// </summary>
         /// <param name="users">List user thêm mới</param>
         /// <returns>Số bản ghi thêm mới thành công</returns>
-        public override int InsertMulti(List<User> users)
+        public int InsertMultiUserAndUserRole(List<User> users, IDbTransaction transaction)
         {
-            sqlConnection = new MySqlConnection(connectString);
-            sqlConnection.Open();
-            using(var transaction = sqlConnection.BeginTransaction())
-            {
-                DynamicParameters parameters = new DynamicParameters();
-                var userRoles = HandleUserRoleInsert(users);
-                var sqlInsertMultiUserRole = BuildSqlInsertMulti<UserRole>(userRoles, parameters);
-                var sqlInsertMultiUser = BuildSqlInsertMulti(users,parameters);
+            List<UserRole> userRoles = HandleUserRoleInsert(users);
 
-                var userInserted = sqlConnection.Execute(sqlInsertMultiUser, param: parameters, transaction: transaction);
-                var userRoleInserted = sqlConnection.Execute(sqlInsertMultiUserRole, param: parameters, transaction: transaction);
+            var userInserted = InsertMulti<User>(users, transaction);
+            var userRoleInserted = InsertMulti<UserRole>(userRoles, transaction);
 
-                if (userInserted != users.Count || userRoleInserted != userRoles.Count)
-                    transaction.Rollback();
-                else
-                    transaction.Commit();
+            if (userInserted != users.Count || userRoleInserted != userRoles.Count)
+                transaction.Rollback();
 
-                CloseDB();
-                return userInserted;
-            }
+            return userInserted;
         }
         #endregion
 
@@ -173,22 +149,12 @@ namespace MISA.PROCESS.DAL.Repository
         {
             List<UserRole> userRoles = new List<UserRole>();
 
-            foreach(User user in users)
+            for (int i=0; i < users.Count; i++)
             {
-                int userRoleIndex = 0;
-                string roleNames = string.Empty;
-                foreach(RoleUpdate role in user.Roles)
-                {
+                User user = users[i] as User;
+                foreach (RoleUpdate role in user.Roles)
                     userRoles.Add(new UserRole(user.UserID, role.RoleID));
-
-                    if (userRoleIndex == 0)
-                        roleNames += $"{role.RoleName}";
-                    else
-                        roleNames += $"; {role.RoleName}";
-
-                    userRoleIndex++;
-                }
-                user.RoleNames = roleNames;
+                user.RoleNames = HandleGetRoleNames(user.Roles);
             }
 
             return userRoles;
@@ -201,87 +167,80 @@ namespace MISA.PROCESS.DAL.Repository
         /// Author : mhungwebdev (30/8/2022)
         /// </summary>
         /// <param name="listLastUpdate">List role của user sau khi update</param>
-        /// <param name="listDelete">List role sẽ xóa</param>
-        /// <param name="listInsert">List role sẽ thêm mới</param>
+        /// <param name="listDelete">List id user role sẽ xóa</param>
+        /// <param name="listInsert">List user role sẽ thêm mới</param>
         /// <param name="userID">Id của user sửa</param>
         /// <returns>Số bản ghi lưu thành công</returns>
-        public int UpdateRole(List<RoleUpdate> listLastUpdate, List<RoleUpdate> listDelete, List<RoleUpdate> listInsert, Guid userID)
+        public int UpdateRole(List<RoleUpdate> listLastUpdate, List<Guid> listDelete, List<UserRole> listInsert, Guid userID, IDbTransaction transaction)
         {
-            sqlConnection = new MySqlConnection(connectString);
-            sqlConnection.Open();
 
-            using(var transaction = sqlConnection.BeginTransaction())
+            DynamicParameters parameters = new DynamicParameters();
+
+            int userRoleDeleted, userRoleInserted;
+            HandleUpdateUserRole(listDelete, listInsert, userID, transaction, parameters, out userRoleDeleted, out userRoleInserted);
+
+            string roleNames = HandleGetRoleNames(listLastUpdate);
+            var sqlUpdateUser = "Proc_User_UpdateRoleNames";
+            parameters.Add("RoleNames", roleNames);
+            parameters.Add("UserID", userID);
+
+            var res = sqlConnection.Execute(sqlUpdateUser, param: parameters, transaction,commandType:CommandType.StoredProcedure);
+
+            if (res != 1 || userRoleDeleted != listDelete.Count || userRoleInserted != listInsert.Count)
+                transaction.Rollback();
+
+            return res;
+        }
+        #endregion
+
+        #region HandleUpdateUserRole
+        /// <summary>
+        /// Cập nhật user role cho user
+        /// Author : mhungwebdev (10/9/2022)
+        /// </summary>
+        /// <param name="listDelete">list id user role xóa</param>
+        /// <param name="listInsert">list user role thêm mới</param>
+        /// <param name="userID">id của user</param>
+        /// <param name="transaction">transaction</param>
+        /// <param name="parameters">parameter</param>
+        /// <param name="userRoleDeleted">Số user role xóa được</param>
+        /// <param name="userRoleInserted">Số user role thêm mới được</param>
+        private void HandleUpdateUserRole(List<Guid> listDelete, List<UserRole> listInsert, Guid userID, IDbTransaction transaction, DynamicParameters parameters, out int userRoleDeleted, out int userRoleInserted)
+        {
+            userRoleDeleted = 0;
+            userRoleInserted = 0;
+
+            if (listDelete.Count > 0)
+                userRoleDeleted = DeleteMulti<UserRole>(listDelete, transaction, "UserID", userID);
+
+            if (listInsert.Count > 0)
+                userRoleInserted = InsertMulti<UserRole>(listInsert, transaction);
+
+        }
+        #endregion
+
+        #region HandleGetRoleNames
+        /// <summary>
+        /// Xử lý lấy rolenames cho user
+        /// Author : mhungwebdev (10/9/2022)
+        /// </summary>
+        /// <param name="listLastUpdate">list role update của user</param>
+        /// <returns>rolenames mới</returns>
+        private static string HandleGetRoleNames(List<RoleUpdate> listLastUpdate)
+        {
+            string roleNames = string.Empty;
+            int roleNameIndex = 0;
+
+            foreach (RoleUpdate roleUpdate in listLastUpdate)
             {
-                DynamicParameters parameters = new DynamicParameters();
-                parameters.Add("@UserID", userID);
-                parameters.Add("@Now", DateTime.Now);
-
-                string roleNames = string.Empty;
-                int roleNameIndex = 0;
-
-                foreach (RoleUpdate roleUpdate in listLastUpdate)
-                {
-                    if (roleNameIndex == 0)
-                        roleNames += $"{roleUpdate.RoleName}";
-                    else
-                        roleNames += $"; {roleUpdate.RoleName}";
-                    roleNameIndex++;
-                }
-                
-
-                if (listDelete.Count > 0)
-                {
-                    int i = 0;
-                    foreach(RoleUpdate roleUpdate in listDelete)
-                    {
-                        var sqlCommand = $"Delete from User_Role " +
-                            $"where RoleID = @RoleID{i} And UserID = @UserID";
-                        parameters.Add($"RoleID{i}",roleUpdate.RoleID);
-                        sqlConnection.Execute(sqlCommand, param: parameters, transaction);
-                        i++;
-                    }
-                }
-
-                if (listInsert.Count > 0)
-                {
-                    var sqlInsertMultiUserRole = $"INSERT INTO User_Role " +
-                             $"(UserID," +
-                             $"RoleID," +
-                             $"CreatedBy," +
-                             $"CreatedDate," +
-                             $"ModifiedBy," +
-                             $"ModifiedDate) " +
-                             $"VALUES ";
-                    int rowIndex = 0;
-                    foreach (RoleUpdate roleUpdate in listInsert)
-                    {
-                        sqlInsertMultiUserRole += $"(@UserID," +
-                            $"@RoleID{rowIndex}," +
-                            $"'mhungwebdev'," +
-                            $"@Now," +
-                            $"'mhungwebdev'," +
-                            $"@Now),";
-
-                        parameters.Add($"@UserID", userID);
-                        parameters.Add($"@RoleID{rowIndex}", roleUpdate.RoleID);
-                        rowIndex++;
-                    }
-
-                    sqlInsertMultiUserRole = sqlInsertMultiUserRole[..^1];
-                    sqlConnection.Execute(sqlInsertMultiUserRole, param: parameters, transaction);
-                }
-
-                var sqlUpdateUser = $"Update User set " +
-                    $"RoleNames = @RoleNames," +
-                    $"ModifiedDate = @Now where UserID = @UserID";
-                parameters.Add("@RoleNames",roleNames);
-                var res = sqlConnection.Execute(sqlUpdateUser, param: parameters, transaction);
-                transaction.Commit();
-                sqlConnection.Dispose();
-                sqlConnection.Close();
-
-                return res;
+                if (roleNameIndex == 0)
+                    roleNames += $"{roleUpdate.RoleName}";
+                else
+                    roleNames += $"; {roleUpdate.RoleName}";
+                roleNameIndex++;
             }
+
+            return roleNames;
         }
         #endregion
     }

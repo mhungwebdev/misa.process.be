@@ -1,6 +1,7 @@
 ﻿using MISA.PROCESS.COMMON.Entities;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,10 +33,19 @@ namespace MISA.PROCESS.DAL.Interfaces
         /// Author : mhungwebdev (30/8/2022)
         /// </summary>
         /// <param name="listLastUpdate">List role của user sau khi update</param>
-        /// <param name="listDelete">List role sẽ xóa</param>
-        /// <param name="listInsert">List role sẽ thêm mới</param>
+        /// <param name="listDelete">List id user role sẽ xóa</param>
+        /// <param name="listInsert">List user role sẽ thêm mới</param>
         /// <param name="userID">Id của user sửa</param>
         /// <returns>Số bản ghi lưu thành công</returns>
-        int UpdateRole(List<RoleUpdate> listLastUpdate,List<RoleUpdate> listDelete,List<RoleUpdate> listInsert,Guid userID);
+        int UpdateRole(List<RoleUpdate> listLastUpdate,List<Guid> listDelete,List<UserRole> listInsert,Guid userID,IDbTransaction transaction);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="User"></typeparam>
+        /// <param name="users"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        int InsertMultiUserAndUserRole(List<User> users, IDbTransaction transaction);
     }
 }

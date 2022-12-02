@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MISA.core.Exceptions
+namespace MISA.PROCESS.COMMON.Exceptions
 {
     /// <summary>
     /// Custome exception
@@ -34,7 +34,7 @@ namespace MISA.core.Exceptions
         {
             get
             {
-                return Resources.ExceptionMessage;
+                return Resources.Resources.ExceptionMessage;
             }
         }
     }

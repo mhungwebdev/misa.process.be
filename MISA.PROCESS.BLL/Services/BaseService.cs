@@ -1,12 +1,13 @@
-﻿using MISA.core.Exceptions;
-using MISA.PROCESS.BLL.Interfaces;
+﻿using MISA.PROCESS.BLL.Interfaces;
 using MISA.PROCESS.COMMON.Entities;
 using MISA.PROCESS.COMMON.Enum;
+using MISA.PROCESS.COMMON.Exceptions;
 using MISA.PROCESS.COMMON.MISAAttributes;
 using MISA.PROCESS.COMMON.Resources;
 using MISA.PROCESS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -16,6 +17,10 @@ namespace MISA.PROCESS.BLL.Services
 {
     public class BaseService<MISAEntity> : IBaseService<MISAEntity>
     {
+        #region Declar
+        protected IDbConnection connection;
+        #endregion
+
         #region contructor
         IBaseRepository<MISAEntity> _baseRepository;
 
@@ -34,7 +39,7 @@ namespace MISA.PROCESS.BLL.Services
         /// <returns>1 nếu thành công, 0 nếu thất bại</returns>
         public int Insert(MISAEntity entity)
         {
-            Dictionary<string, string> errors = ValidateGeneral(entity, null);
+            Dictionary<string, string> errors = ValidateGeneral(entity);
 
             if (errors.Count() > 0)
             {
@@ -85,79 +90,33 @@ namespace MISA.PROCESS.BLL.Services
         /// <param name="entity">Đối tượng cần validate</param>
         /// <param name="id">id của đối tượng validate</param>
         /// <returns>Đối tượng errors có kiểu Dictionary<string,string>, key là tên field, value là thông báo lỗi</returns>
-        protected Dictionary<string, string> ValidateGeneral(MISAEntity entity, Guid? id)
+        protected Dictionary<string, string> ValidateGeneral(MISAEntity entity, Guid? id = null)
         {
             Dictionary<string, string> errors = new Dictionary<string, string>();
+            ValidateRequire(entity, errors);
+            ValidateUnique(entity, id, errors);
+            ValidateEmail(entity, errors);
+            ValidateLength(entity, errors);
 
-            //kiểm tra field require
-            var propRequires = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(Require)));
-            foreach (var propRequire in propRequires)
-            {
-                var value = propRequire.GetValue(entity);
-                string fieldName = propRequire.Name;
+            //kiểm tra custome
+            Dictionary<string, string> errorCustom = ValidateCustom(entity);
 
-                if (value == null || String.IsNullOrEmpty(value.ToString()))
-                {
-                    string nameDisplay = propRequire.Name;
+            if (errorCustom != null)
+                errors = errors.Concat(errorCustom).ToDictionary(x => x.Key, x => x.Value);
 
-                    var propNames = propRequire.GetCustomAttributes(typeof(PropertyName), true);
+            return errors;
+        }
+        #endregion
 
-                    if (propNames.Length > 0)
-                    {
-                        nameDisplay = (propNames[0] as PropertyName).Name;
-                    }
-
-                    errors.Add(fieldName, string.Format(Resources.EmptyFieldRequireMsg, nameDisplay));
-                }
-            }
-
-            //kiểm tra field unique
-            var propUniques = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(Unique)));
-            foreach (var propUnique in propUniques)
-            {
-                var value = propUnique.GetValue(entity);
-                string fieldName = propUnique.Name;
-                if (value != null || String.IsNullOrEmpty(value.ToString()))
-                {
-                    if (_baseRepository.CheckUnique(value, propUnique.Name, id))
-                    {
-                        string nameDisplay = fieldName;
-
-                        var propNames = propUnique.GetCustomAttributes(typeof(PropertyName), true);
-
-                        if (propNames.Length > 0)
-                            nameDisplay = (propNames[0] as PropertyName).Name;
-
-                        errors.Add(fieldName, string.Format(Resources.UniqueErrorMsg, nameDisplay));
-                    }
-                }
-            }
-
-            //kiểm tra field email
-            var propEmails = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(Email)));
-            foreach (var propEmail in propEmails)
-            {
-                var value = propEmail.GetValue(entity);
-                var fieldName = propEmail.Name;
-
-                if (!(String.IsNullOrEmpty(value.ToString())))
-                {
-                    Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
-                    Match match = regex.Match(value.ToString());
-
-                    if (!(match.Success))
-                    {
-                        var nameDisplay = fieldName;
-
-                        var propNames = propEmail.GetCustomAttributes(typeof(PropertyName), true);
-                        if (propNames.Length > 0)
-                            nameDisplay = (propNames[0] as PropertyName).Name;
-
-                        errors.Add(fieldName, String.Format(Resources.EmailErrorMsg, nameDisplay));
-                    }
-                }
-            }
-
+        #region ValidateLength
+        /// <summary>
+        /// Kiểm tra độ dài
+        /// Author : mhungwebdev (10/9/2022)
+        /// </summary>
+        /// <param name="entity">Bản ghi muốn validate</param>
+        /// <param name="errors">Đối tượng lưu trữ lỗi</param>
+        private static void ValidateLength(MISAEntity entity, Dictionary<string, string> errors)
+        {
             //kiểm tra độ dài
             var propLengths = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(Length)));
             foreach (var propLength in propLengths)
@@ -184,14 +143,109 @@ namespace MISA.PROCESS.BLL.Services
                     errors.Add(fieldName, String.Format(Resources.TooLongValid, nameDisplay, fieldLength));
                 }
             }
+        }
+        #endregion
 
-            //kiểm tra custome
-            Dictionary<string, string> errorCustom = ValidateCustom(entity, id);
+        #region ValidateEmail
+        /// <summary>
+        /// Kiểm tra email
+        /// Author : mhungwebdev (10/9/2022)
+        /// </summary>
+        /// <param name="entity">Bản ghi muốn validate</param>
+        /// <param name="errors">Đối tượng lưu trữ lỗi</param>
+        private static void ValidateEmail(MISAEntity entity, Dictionary<string, string> errors)
+        {
+            //kiểm tra field email
+            var propEmails = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(Email)));
+            foreach (var propEmail in propEmails)
+            {
+                var value = propEmail.GetValue(entity);
+                var fieldName = propEmail.Name;
 
-            if (errorCustom != null)
-                errors = errors.Concat(errorCustom).ToDictionary(x => x.Key, x => x.Value);
+                if (!(String.IsNullOrEmpty(value.ToString())))
+                {
+                    Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+                    Match match = regex.Match(value.ToString());
 
-            return errors;
+                    if (!(match.Success))
+                    {
+                        var nameDisplay = fieldName;
+
+                        var propNames = propEmail.GetCustomAttributes(typeof(PropertyName), true);
+                        if (propNames.Length > 0)
+                            nameDisplay = (propNames[0] as PropertyName).Name;
+
+                        errors.Add(fieldName, String.Format(Resources.EmailErrorMsg, nameDisplay));
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region ValidateUnique
+        /// <summary>
+        /// Kiểm tra trùng lặp cho field unique
+        /// Author : mhungwebdev (10/9/2022)
+        /// </summary>
+        /// <param name="entity">Bản ghi muốn validate</param>
+        /// <param name="id">id của bản ghi muốn validate</param>
+        /// <param name="errors">Đối tượng lưu trữ lỗi</param>
+        private void ValidateUnique(MISAEntity entity, Guid? id, Dictionary<string, string> errors)
+        {
+            //kiểm tra field unique
+            var propUniques = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(Unique)));
+            foreach (var propUnique in propUniques)
+            {
+                var value = propUnique.GetValue(entity);
+                string fieldName = propUnique.Name;
+                if (value != null || String.IsNullOrEmpty(value.ToString()))
+                {
+                    if (_baseRepository.CheckUnique(value, propUnique.Name, id))
+                    {
+                        string nameDisplay = fieldName;
+
+                        var propNames = propUnique.GetCustomAttributes(typeof(PropertyName), true);
+
+                        if (propNames.Length > 0)
+                            nameDisplay = (propNames[0] as PropertyName).Name;
+
+                        errors.Add(fieldName, string.Format(Resources.UniqueErrorMsg, nameDisplay));
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region ValidateRequire
+        /// <summary>
+        /// Kiểm tra dữ liệu trống cho field require
+        /// Author : mhungwebdev (10/9/2022)
+        /// </summary>
+        /// <param name="entity">Bản ghi muốn validate</param>
+        /// <param name="errors">Đối tượng lưu trữ lỗi</param>
+        private static void ValidateRequire(MISAEntity entity, Dictionary<string, string> errors)
+        {
+            //kiểm tra field require
+            var propRequires = typeof(MISAEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(Require)));
+            foreach (var propRequire in propRequires)
+            {
+                var value = propRequire.GetValue(entity);
+                string fieldName = propRequire.Name;
+
+                if (value == null || String.IsNullOrEmpty(value.ToString()))
+                {
+                    string nameDisplay = propRequire.Name;
+
+                    var propNames = propRequire.GetCustomAttributes(typeof(PropertyName), true);
+
+                    if (propNames.Length > 0)
+                    {
+                        nameDisplay = (propNames[0] as PropertyName).Name;
+                    }
+
+                    errors.Add(fieldName, string.Format(Resources.EmptyFieldRequireMsg, nameDisplay));
+                }
+            }
         }
         #endregion
 
@@ -203,7 +257,7 @@ namespace MISA.PROCESS.BLL.Services
         /// <param name="entity">Đối tượng cần validate</param>
         /// <param name="id">id của đối tượng validate</param>
         /// <returns>Đối tượng errors có kiểu Dictionary<string,string>, key là tên field, value là thông báo lỗi</returns>
-        public virtual Dictionary<string, string> ValidateCustom(MISAEntity entity, Guid? id)
+        public virtual Dictionary<string, string> ValidateCustom(MISAEntity entity, Guid? id = null)
         {
             return null;
         }
@@ -254,11 +308,27 @@ namespace MISA.PROCESS.BLL.Services
             if (listError.Count() > 0)
                 HandleThrowError(InteractiveMode.Multi, listError);
 
-            var res = _baseRepository.InsertMulti(entities);
+            connection = _baseRepository.GetConnection();
+            connection.Open();
 
-            return res;
+            using (var transaction = connection.BeginTransaction())
+            {
+                int res = DoInsertMulti(entities, transaction);
+
+                transaction.Commit();
+
+                connection.Dispose();
+                connection.Close();
+
+                return res;
+            }
         }
         #endregion
+
+        public virtual int DoInsertMulti(List<MISAEntity> entities, IDbTransaction transaction)
+        {
+            return _baseRepository.InsertMulti(entities, transaction);
+        }
 
         #region HandleThrowError
         /// <summary>
