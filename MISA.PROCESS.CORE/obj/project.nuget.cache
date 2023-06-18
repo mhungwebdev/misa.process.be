@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "aMmpskaYDNRoERAM9YtefuIqv9jAVPMTtd+zrTf/2nRJgppBJAiK++RDKiGdquY7wf4XFo3iKfQcBTj+OhpFzQ==",
+  "dgSpecHash": "rmT5aaT5S2Nozjgq32FWWkNIB1Ma55CoJQlyVgCcLCT0tI3rogAOsZlSs8c1pne+bqmbC6SMEChd6hmWzR9iZA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Admin\\OneDrive\\Documents\\MISA_Web06_GD2_LeManhHung\\MISA.PROCESS\\MISA.PROCESS.CORE\\MISA.PROCESS.COMMON.csproj",
+  "projectFilePath": "C:\\Users\\Admin\\OneDrive\\Máy tính\\misa.process.be\\MISA.PROCESS.CORE\\MISA.PROCESS.COMMON.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.2.0\\microsoft.aspnetcore.authentication.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.authentication.core\\2.2.0\\microsoft.aspnetcore.authentication.core.2.2.0.nupkg.sha512",

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "VjHpFrqxsM1s21UkxqQxF6oFaY6FkPM8BnkZZuwvFAoa2mzmX+2fArAiwZLZB+G8brPDkNrwdGSP6WcXiNU/kQ==",
+  "dgSpecHash": "lxkli9wNU8HWxeR3gLJ8TBjIu6E8IFO6QabNdY2P2Mh5xfeRBfQDxUYAGsv7JMwgDKJEcnqaA069gvoPd91HrA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Admin\\OneDrive\\Documents\\MISA_Web06_GD2_LeManhHung\\MISA.PROCESS\\MISA.PROCESS.BLL\\MISA.PROCESS.BLL.csproj",
+  "projectFilePath": "C:\\Users\\Admin\\OneDrive\\Máy tính\\misa.process.be\\MISA.PROCESS.BLL\\MISA.PROCESS.BLL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Admin\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.2.0\\microsoft.aspnetcore.authentication.abstractions.2.2.0.nupkg.sha512",

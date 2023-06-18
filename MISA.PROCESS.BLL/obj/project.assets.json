@@ -4176,11 +4176,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Admin\\OneDrive\\Documents\\MISA_Web06_GD2_LeManhHung\\MISA.PROCESS\\MISA.PROCESS.BLL\\MISA.PROCESS.BLL.csproj",
+      "projectUniqueName": "C:\\Users\\Admin\\OneDrive\\Máy tính\\misa.process.be\\MISA.PROCESS.BLL\\MISA.PROCESS.BLL.csproj",
       "projectName": "MISA.PROCESS.BLL",
-      "projectPath": "C:\\Users\\Admin\\OneDrive\\Documents\\MISA_Web06_GD2_LeManhHung\\MISA.PROCESS\\MISA.PROCESS.BLL\\MISA.PROCESS.BLL.csproj",
+      "projectPath": "C:\\Users\\Admin\\OneDrive\\Máy tính\\misa.process.be\\MISA.PROCESS.BLL\\MISA.PROCESS.BLL.csproj",
       "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Admin\\OneDrive\\Documents\\MISA_Web06_GD2_LeManhHung\\MISA.PROCESS\\MISA.PROCESS.BLL\\obj\\",
+      "outputPath": "C:\\Users\\Admin\\OneDrive\\Máy tính\\misa.process.be\\MISA.PROCESS.BLL\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -4197,11 +4197,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\Admin\\OneDrive\\Documents\\MISA_Web06_GD2_LeManhHung\\MISA.PROCESS\\MISA.PROCESS.CORE\\MISA.PROCESS.COMMON.csproj": {
-              "projectPath": "C:\\Users\\Admin\\OneDrive\\Documents\\MISA_Web06_GD2_LeManhHung\\MISA.PROCESS\\MISA.PROCESS.CORE\\MISA.PROCESS.COMMON.csproj"
+            "C:\\Users\\Admin\\OneDrive\\Máy tính\\misa.process.be\\MISA.PROCESS.CORE\\MISA.PROCESS.COMMON.csproj": {
+              "projectPath": "C:\\Users\\Admin\\OneDrive\\Máy tính\\misa.process.be\\MISA.PROCESS.CORE\\MISA.PROCESS.COMMON.csproj"
             },
-            "C:\\Users\\Admin\\OneDrive\\Documents\\MISA_Web06_GD2_LeManhHung\\MISA.PROCESS\\MISA.PROCESS.INFRASTRUCTURE\\MISA.PROCESS.DAL.csproj": {
-              "projectPath": "C:\\Users\\Admin\\OneDrive\\Documents\\MISA_Web06_GD2_LeManhHung\\MISA.PROCESS\\MISA.PROCESS.INFRASTRUCTURE\\MISA.PROCESS.DAL.csproj"
+            "C:\\Users\\Admin\\OneDrive\\Máy tính\\misa.process.be\\MISA.PROCESS.INFRASTRUCTURE\\MISA.PROCESS.DAL.csproj": {
+              "projectPath": "C:\\Users\\Admin\\OneDrive\\Máy tính\\misa.process.be\\MISA.PROCESS.INFRASTRUCTURE\\MISA.PROCESS.DAL.csproj"
             }
           }
         }
@@ -4231,7 +4231,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.101\\RuntimeIdentifierGraph.json"
       }
     }
   }
