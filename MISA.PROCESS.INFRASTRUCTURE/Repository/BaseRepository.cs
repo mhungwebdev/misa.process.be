@@ -30,7 +30,7 @@ namespace MISA.PROCESS.DAL.Repository
         /// <summary>
         /// Đóng kêt nối DB
         /// </summary>
-        protected void CloseDB()
+        public void CloseDB()
         {
             sqlConnection.Dispose();
             sqlConnection.Close();
@@ -41,7 +41,7 @@ namespace MISA.PROCESS.DAL.Repository
         /// <summary>
         /// Mở kết nối DB
         /// </summary>
-        protected void OpenDB()
+        public void OpenDB()
         {
             sqlConnection = new MySqlConnection(connectString);
             sqlConnection.Open();
@@ -123,7 +123,7 @@ namespace MISA.PROCESS.DAL.Repository
             using (sqlConnection = new MySqlConnection(connectString))
             {
                 var tableName = typeof(MISAEntity).Name;
-                var store = $"Proc_{tableName}_GetAll";
+                var store = $"Proc_GetAll{tableName}";
 
                 var res = sqlConnection.Query<MISAEntity>(store, commandType: CommandType.StoredProcedure);
 
@@ -144,7 +144,7 @@ namespace MISA.PROCESS.DAL.Repository
             using (sqlConnection = new MySqlConnection(connectString))
             {
                 var tableName = typeof(MISAEntity).Name;
-                var store = $"Proc_{tableName}_GetById";
+                var store = $"Proc_Get{tableName}ById";
                 DynamicParameters parameters = new DynamicParameters();
 
                 parameters.Add("Id", id.ToString());
@@ -168,7 +168,7 @@ namespace MISA.PROCESS.DAL.Repository
             using (var transaction = sqlConnection.BeginTransaction())
             {
                 var tableName = typeof(MISAEntity).Name;
-                var store = $"Proc_{tableName}_Insert";
+                var store = $"Proc_Insert{tableName}";
 
                 var res = sqlConnection.Execute(store, param: entity, transaction: transaction, commandType: CommandType.StoredProcedure);
 

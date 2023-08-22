@@ -39,7 +39,7 @@ namespace MISA.PROCESS.DAL.Repository
             {
                 DynamicParameters parameters = new DynamicParameters();
 
-                var store = $"Proc_User_Filter";
+                var store = $"Proc_FilterUser";
                 parameters.Add("Keyword", keyword);
                 parameters.Add("RoleID", roleID);
                 parameters.Add("LimitRecord", pageSize);
@@ -80,7 +80,7 @@ namespace MISA.PROCESS.DAL.Repository
         {
             using (sqlConnection = new MySqlConnection(connectString))
             {
-                var sqlGetNewCode = "Proc_User_GetNewEmployeeCode";
+                var sqlGetNewCode = "Proc_GetNewEmployeeCode";
                 DynamicParameters parameters = new DynamicParameters();
                 parameters.Add("NewEmployeeCode", direction: ParameterDirection.Output);
 
@@ -103,7 +103,7 @@ namespace MISA.PROCESS.DAL.Repository
         {
             using (sqlConnection = new MySqlConnection(connectString))
             {
-                var storeGetUser = "Proc_User_GetById";
+                var storeGetUser = "Proc_GetUserById";
                 DynamicParameters parameters = new DynamicParameters();
                 parameters.Add("Id", id);
 
